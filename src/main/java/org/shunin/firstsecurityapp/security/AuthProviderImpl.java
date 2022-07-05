@@ -23,15 +23,18 @@ public class AuthProviderImpl implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        // search user by name
         String username = authentication.getName();
-
+        // return user wrapped by UserDetails
         UserDetails personDetails = personDetailsService.loadUserByUsername(username);
 
+        // get password from web form
         String password = authentication.getCredentials().toString();
-
+        // compare
         if(!password.equals(personDetails.getPassword()))
             throw new BadCredentialsException("Incorrect password");
 
+        // return (if OK) Autentication with Principal inside
         return new UsernamePasswordAuthenticationToken(personDetails, password,
                 Collections.emptyList());
     }
