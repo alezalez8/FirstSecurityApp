@@ -12,9 +12,9 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @EnableWebSecurity
-public class SecurityConfig  extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-  private final PersonDetailsService personDetailsService;
+    private final PersonDetailsService personDetailsService;
 
     @Autowired
     public SecurityConfig(PersonDetailsService personDetailsService) {
@@ -26,10 +26,20 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // конфигурируем сам Spring Security
         // конфигурируем авторизацию
+        http.csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/auth/login", "/error").permitAll()  // всех пускаем на эти две страницы
+                .anyRequest().authenticated()  // все другие должны авторизироваться. Эта и две верхние строки - авторизация
+                .and()// а здесь уже идет аутентификация
+                .formLogin().loginPage("/auth/login")  // вначале направляет на эту страницу
+                .loginProcessingUrl("/process_login")   // ловит ответ от нее и пытается аутентифицироваться
+                .defaultSuccessUrl("/hello", true) // после успешней аутент. перенапр-ет на /hello
+                .failureUrl("/auth/login?error");  // после неуспешной аутент. перенапр-ет на /auth/login?error
     }
 
 
     // Настраивает аутентификацию
+    @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(personDetailsService);
     }
