@@ -28,13 +28,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // конфигурируем авторизацию
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/auth/login", "/error").permitAll()  // всех пускаем на эти две страницы
+                .antMatchers("/auth/login", "/auth/registration", "/error").permitAll()  // всех пускаем на эти две страницы
                 .anyRequest().authenticated()  // все другие должны авторизироваться. Эта и две верхние строки - авторизация
                 .and()// а здесь уже идет аутентификация
                 .formLogin().loginPage("/auth/login")  // вначале направляет на эту страницу
                 .loginProcessingUrl("/process_login")   // ловит ответ от нее и пытается аутентифицироваться
                 .defaultSuccessUrl("/hello", true) // после успешней аутент. перенапр-ет на /hello
-                .failureUrl("/auth/login?error");  // после неуспешной аутент. перенапр-ет на /auth/login?error
+                .failureUrl("/auth/login?error")  // после неуспешной аутент. перенапр-ет на /auth/login?error
+                .and()
+                .logout()
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/auth/login");
     }
 
 
