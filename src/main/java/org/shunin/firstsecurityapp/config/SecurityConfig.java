@@ -28,8 +28,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // конфигурируем сам Spring Security
         // конфигурируем авторизацию
         http.authorizeRequests()
+                .antMatchers("/admin").hasRole("ADMIN")
                 .antMatchers("/auth/login", "/auth/registration", "/error").permitAll()  // всех пускаем на эти две страницы
-                .anyRequest().authenticated()  // все другие должны авторизироваться. Эта и две верхние строки - авторизация
+                .anyRequest().hasAnyRole("USER", "ADMIN")
+                //.anyRequest().authenticated()  // все другие должны авторизироваться. Эта и две верхние строки - авторизация
                 .and()// а здесь уже идет аутентификация
                 .formLogin().loginPage("/auth/login")  // вначале направляет на эту страницу
                 .loginProcessingUrl("/process_login")   // ловит ответ от нее и пытается аутентифицироваться
